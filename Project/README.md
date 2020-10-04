@@ -1,7 +1,7 @@
-코드가 너무많아...............
+WATERMELON PROJECT라 읽고
 ================================
-내일은 다 할수있겠지....? 
+MELON CLONE CODING이라 썼다.
 ----------------------
-(반응형은무슨....)
+(반응형은무슨....추석연휴를 통째로 갈아넣었다.)
 
-![캡처](https://user-images.githubusercontent.com/68681443/94990608-631e8d00-05b8-11eb-8893-451e071d42df.JPG)
+![완성](https://user-images.githubusercontent.com/68681443/95006143-05338900-063c-11eb-92cf-f6865e6838d6.JPG)
