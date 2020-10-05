@@ -41,7 +41,7 @@ commit 다루기
 -------------------
 #### 1. git log : 현재까지 모든 커밋 소환(4줄형태로_ID,사용자ID,날짜,커밋메세지)
   * __git log --prety=oneline__ : (1줄 형태로 나타낸다)
-#### 2. git show + ID : 각 기록에 무슨일이 있었는지 확인
+#### 2. git show + ID : 각 기록에 무슨일이 있었는지 확인(tag확인가능)
 #### 3. git commit => i(기록모드) => commit메세지(제목 / 내용) => 맨아래 :wq 써서 마무리
 #### 4. git alias : 자주쓰는 Command에 별명을 붙임
   * git config alias.history 'log --prety=oneline' : alias.원하는별명 '원래의 Command'  
