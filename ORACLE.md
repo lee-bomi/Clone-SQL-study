@@ -4,7 +4,7 @@ JOIN에 쓰는 옵션
 2. ON(더많이 쓴다)  
 
 
-
+```sql
 drop table department;
 create table department
 (
@@ -599,3 +599,4 @@ BEGIN
 END;
 /
 SELECT * FROM patient;
+```
