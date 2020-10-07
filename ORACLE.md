@@ -599,4 +599,239 @@ BEGIN
 END;
 /
 SELECT * FROM patient;
+
+
+-- 10/07
+-- 서브프로그램이란?
+-- 프로그램내의 다른 루틴을 위해서 특정한 기능을 수행하는 부분적(partial) 프로그램,
+-- 메인 블록에서 반복되거나, 에러블록에서 공통으로처리되는 명령문을 추출(extract)하여, 별개의 서브프로그램으로 작성하여 사용하면
+-- 프로그램 해독이 쉽고 , 호출이 가능하기때문에 효율성, 유지보수성, 호환성 측면에서 장점이 많음
+
+-- 환자번호 YN0001과 섭씨 체온이 40.0도를 화씨온도로 변환하여 Patient테이블에 저장.
+-- 또한 YN0002는 환자의 데이터만 다르고 처리내용은 동일하다.
+-- 이럴경우 서브프로그램으로 중복된 데이터를 처리하고 메인블록에서는 호출만 한다.
+
+
+-- 프로시저 생성구문 <어떤 프로세스를 절차적으로 기술해 놓은것> 
+-- 프로시저명 : 생성하려는 프로시저명(보조함수명/ 호출되는 함수명, callee)
+-- 형식인자 : IN, OUT, IN OUT;
+-- IN : 호출되는 서브프로그램에 값이 전달되는 것을 지정하고 생략가능. 기본값을 지정하는경우 리터럴, 변수(variable), 식(expression)등이 올수있다.
+-- OUT : 프로시저가 호출 프로그램에게 값을 반환하는 것을 지정. 기본값을 지정할경우 변수만 올 수 있다.
+-- IN OUT : 호출되는 서브프로그램에 값을 전달하고 실행후 호출 프로그램에게 값을 반환하는 것을 지정
+-- 데이터타입 : 형식인자에 대한 데이터타입을 기술 
+-- := or Default : 형식인자에 기본값을 지정하는 예약어
+-- 지역변수 선언: 프로시저 서브프로그램에서 실행할 명령문을 기술
+-- 예외처리문 : 예외(exception) 처리(process/execute) 에 관한 명령문(instruction) 기술
+
+-- =>프로시저 호출방법
+-- 프로시저명 (실인자1, 실인자2, ...); -- 실인자(argument)
+-- 실인자: 호출하는 프로시저 서브프로그램에게 전달할 값, 실인자는 리터럴,칼럼명,변수명으로 기술 
+
+
+-- 함수(function) 생성구문 <프로세스를 수행하기위해 필요한 기능> 
+-- 함수기술방법
+-- 생성하려는 함수명 기술
+-- 형식인자 : 값을 주고받는 인자(파라미터)로 프로시저와 동일한 형식으로 
+-- return데이터타입 : 반환되는 데이터 타입기술
+-- 지역변수선언 : 함수 서브프로그램에서 필요한 변수나 상수등을 기술
+-- 처리명령문 :  함수 서브프로그램에서 실행할 명령문 기술
+
+-- 함수 호출 방법
+-- 변수명 := 함수명(실인자1, 실인자2, ...);
+-- 기술방법
+-- 함수명 : 호출하려는 함수명 기술
+-- 실인자 : 호출하려는 함수 서브프로그램에게 전달할 값을 기술
+-- 변수명 : 실행한 함수의 결과값을 저장할 변수명 기술 
+
+-- 예제 
+declare
+    v_deg_c NUMBER(4,1) := 0;
+    v_deg_f NUMBER(4,1) := 100.2;
+    -- 함수 서브 프로그램 --
+    FUNCTION temp_change_c(f_temp_deg_f NUMBER)     -- 지역변수
+        return number is        -- 파라미터로 넘버를 받았으니넘버를 리턴
+            f_deg_c NUMBER(4,1) :=0;  -- 함수정의부분
+    BEGIN
+        f_deg_c := (5.0/9.0) * (f_temp_deg_f - 32.0);
+        return f_deg_c;
+    END;
+    --메인블록--
+    BEGIN
+        v_deg_c := temp_change_c(v_deg_f);
+        DBMS_OUTPUT.PUT_LINE('[' || v_deg_f || '] 화씨 온도는' || 
+            '섭씨 온도는 [' || v_deg_c ||']도 입니다.'); 
+    END;
+    /
+ SET SERVEROUTPUT ON
+ 
+ 
+ -- 프로시저 VS FUNCTION의 차이
+ -- 프로시저 
+ -- 형식인자로 데이터를 전달 받을수도, 아닐수도있다 / 실행후 호출한데이터값을 반환할수도 아닐수도있다
+ -- 함수
+ -- 형식인자로 데이터를 전달받을수도, 아닐수도있다. 그러나 실행후 받드시 1개의값을 반환
+ 
+ -- 두개는 정의방법과 호출방법이 다르다
+ -- 블록의 DECLARE에 선언된 프로시저,함수 서브프로그램들은 블록내에서만 호출가능하며,
+ -- 실행할때마다 컴파일을 해야하므로 실행속도가 느리고, 서버에 부하를 주게된다.
+ -- 동일한 서브프로그램들이 여러블록에서 기술되어 사용될 수 있기 때문에 수정할경우에 블록들을 찾아내어 서브프로그램을 수정해야하므로 유지보수가힘들다
+ -- 따라서 한번에 컴파일하면되고, 어떤블록에서도 호출이 가능한 '저장된 프로시저(Stored procedure) 서브프로그램'을 작성하여 사용한다.
+ -- 저장된 서브프로그램은 효율성, 재사용성, 유지보수성, 호환성측면에서 훨씬 좋은 장점을 가진다
+ 
+ --> 저장된 서브프로그램작성(Stored procedure)
+ -- 블록에 선언되지 않고 별도로 저장된 프로시저 서브프로그램이나 저장된 함수 서브프로그램을 작성하여 
+ -- 오라클 데이터베이스에 내장된 PL/SQL블록을 작성하면 블록의 단순화, 효율성, 재사용성, 유지, 보수, 수정등의 장점이 있다.
+ 
+ -- Stored procedure생성
+-- Create [or replace] procedure 프로시저명 (형식인자1,...) is 
+--        [지역변수 선언:]
+-- begin
+--        처리명령문
+-- end;
+
+-- 처음 생성할때는 create procedure문으로 작성할수있으나, 생성된 프로시저를 수정하여 다시 컴파일할경우 create procedure문은 
+-- 오류가 발생하여 삭제후 생성해야한다. 이때 create or replace procedure사용 
+
+-- Stored procedure 예제
+desc patient;
+drop table patient;
+create table patient(
+    Patient_id varchar2(20), 
+    BOdy_Temp_deg_c number(4,1),
+    BOdy_Temp_deg_F number(4,1)
+);
+drop procedure body_temp_change_f;
+create or replace PROCEDURE Body_Temp_Change_F 
+    (f_Patient_ID VARCHAR2, f_temp_Deg_C  number) IS
+        f_Temp_Deg_F number(4,1) := 0; -- 초기값 
+Begin
+    f_temp_deg_F := (9.0/5.0)* f_temp_deg_C+ 32.0;
+    insert into  patient
+        (Patient_id, BOdy_Temp_deg_c,BOdy_Temp_deg_F)
+            values(f_Patient_id,f_Temp_deg_C,f_Temp_deg_F);
+    commit;
+end;  -- 스토어드 프로시저 생성
+/
+EXECUTE body_temp_change_f('YN0005', 43.0);
+SELECT * FROM PATIENT WHERE patient_id = 'YN0005';
+
+
+--Stored function 예제
+Create or replace Function temp_change_c(f_temp_deg_f Number)
+    return number is
+        f_deg_c  NUMBER(4,1) :=0;
+BEGIN
+    f_deg_c := (5.0/9.0) * (f_temp_deg_f - 32.0);
+    RETURN f_deg_c;
+END;
+/
+SELECT patient_id, body_temp_deg_f "환자체온(F)",Temp_change_c(body_temp_deg_f) "환자체온(C)"
+    FROM patient ORDER BY 1;
+    
+    
+    
+-- 문제1) 임의의 테이블 생성
+DROP table test;
+Create table test (
+    kor NUMBER,
+    eng NUMBER,
+    math NUMBER,
+    calculator NUMBER,
+    avg_score NUMBER
+);
+-- 문제2) stored function 생성
+Create or replace Function calculator(kor Number, eng Number, math Number)
+    return number is
+        avg_score NUMBER :=0;
+BEGIN
+    avg_score := (kor + eng + math) / 3;
+    RETURN avg_score;
+END;
+/
+insert into test(kor, eng, math,calculator) values (50, 100, 90, calculator(50,100,90));
+-- 문제3) stored function호출하여 그결과를 받아 출력(select)하세요
+SELECT kor "국어", eng "영어", math "수학", calculator(kor, eng, math) "평균값",
+    CASE WHEN calculator >= 90 THEN avg_score := '수';
+         WHEN calculator >= 80 THEN avg_score := '우';
+         WHEN calculator >= 70 THEN avg_score := '미';
+         WHEN calculator >= 60 THEN avg_score := '양';
+         ELSE '가'
+    END "성적"
+    FROM test;
+    
+
+-- declare사용시기 => stored를 사용하지않는경우
+
+
+-- 커서 & 트리거
+-- 커서 
+--    : 임의의 복수행을 검색하기위한 방법
+--    : select문의 임의의 복수행을 검색하기위한 메커니즘으로, 
+--      실행절에서 엑세스 할 수 있는 데이터의 집합을 선언절에서 오라클db의 메모리영역에 사용자가 선언하는 하나의 객체
+--    : 명시적커서 / 암시적커서로 구분
+--        -1) 명시적커서(explicit cursor)
+--            [1단계] 커서를 선언(declare절에 선언)
+--                   => Cursor 커서명 [(형식인자 ,,)] is select문 
+--            [2단계] 커서를 연다
+--                   => Open 커서
+--            [3단계] 커서로부터 한 행을 가져온다
+--                   => fetch 커서명 into 변수명1, 변수명2, 변수명3, 
+--                   => 인출(fetch)된 커서의 작업 포인터(위치)는 다음포인터로 자리 이동한다 
+--                   => 커서는 순차적으로만 인출(fetch)할 수 있다.
+--                   => 커서에서 인출되는 칼럼의 수와 변수의 수가 동일해야한다.
+--                   => 커서에서 인출되는 칼럼과 변수의 데이터타입이 동일해야한다.
+--            [4단계] 커서를 닫는다
+--                   => Close 커서명
+--             *[2]~[4]단계는 begin - end절에서 처리
+-- 커서와 속성변수
+--  * %ISOPEN : 커서가오픈되어있으면 참, 아니면 거짓
+--  * %FOUND : 커서로부터 행을 인출하면 참, 실패시 거짓
+--  * %NOTFOUND : 커서로부터 행을 인출하지못하면  참, 아니면 거짓
+--  * %NUMCOUNT : 인출한 행의 수를 반환
+--  이것은 나중에 서버프로그램할때 ResultSet이라는 것이 있고, 
+--  이것은 데이터베이스에서 조회하면 ResultSet에 조회된 정보가 저장되고
+--  ResultSet rs =
+--  rs.next() 호출하면 다음 레코드를 가져오는것과 동일함.
+
+
+-- 명시적커서 예제
+desc department;
+declare                               -- 커서를 선언
+    v_dept department%ROWTYPE;
+    CURSOR get_dept IS 
+        SELECT * FROM department
+            order by dept_id;
+begin 
+    open get_dept;                    -- 커서를 연다
+    loop  -- 반복문
+        fetch get_dept into v_dept;   -- 커서를 가져온다
+        exit WHEN get_dept%notfound;
+        DBMS_OUTPUT.PUT_LINE(v_dept.dept_id || ' ' || v_dept.dept_name);
+    end loop;
+    close get_dept;                   -- 커서를 닫는다
+end;
+/
+
+
+
+
+--        -2) 암시적커서(Implicit cursor)
+--            : 커서는 자동으로 open되고, 커서 for~loop문이 반복될때마다 커서로부터 한 행씩 인출된다
+--              인출된 값은 레코드 변수.커서칼럼명으로 사용할수있고, 커서의 모든행이 인출되면 자동으로 
+--              커서 for-loop를 종료. 모든행이 인출되면 커서는 자동으로 닫히게 된다.
+
+-- 암시적커서 예제
+declare
+    cursor get_dept is
+        select * from department
+            order by dept_id;
+begin
+    for loop_rec in get_dept loop
+        DBMS_OUTPUT.PUT_LINE(Get_dept%ROWCOUNT || '번째 인출된 값은' 
+            || Loop_rec.dept_id || ';' || loop_rec.dept_name);
+    end loop;
+end;
+/
+
+
 ```
