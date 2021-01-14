@@ -15,7 +15,10 @@
 ## 💻 개발환경
 - Eclipse
 - Tomcat
+- Java / Spring framework
 - MySQL Workbench 
+- JS & JQuery
+- HTML / CSS
 - GitHub 
 <br>
 
