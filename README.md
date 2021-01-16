@@ -12,10 +12,10 @@
 > 자차관리 및 쇼핑가능한 복합공간  
 
 ## 📅 개발기간
-- 2020.12.20 - 2021. 01.15 
+- 2020.12.20 - 2021. 01.15   
 
 ## 🖥 웹페이지
-[저리카Shop](http://52.78.28.86:8080/carshop/index)
+[저리카Shop](http://52.78.28.86:8080/carshop/index)  
 
 ## 💻 개발환경
 - Eclipse
@@ -24,7 +24,7 @@
 - MySQL Workbench 
 - JS & JQuery
 - HTML / CSS
-- GitHub 
+- GitHub   
 
 
 ## 📑 업데이트 내역
